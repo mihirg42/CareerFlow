@@ -36,8 +36,8 @@ class ApplicationService:
         ApplicationStatus.WITHDRAWN: set(),
     }
 
-    def __init__(self):
-        self.repository = ApplicationRepository()
+    def __init__(self, repository: ApplicationRepository):
+        self.repository = repository
 
     def get_all(self) -> list[dict]:
         return self.repository.get_all()

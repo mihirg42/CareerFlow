@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
+from typing import Annotated
+from app.dependencies import get_service
 
 from app.schemas.application import (
     ApplicationCreate,
@@ -16,16 +18,16 @@ from app.exceptions import (
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
-service = ApplicationService()
+ServiceDep = Annotated[ApplicationService, Depends(get_service)]
 
 
 @router.get("", response_model=list[ApplicationResponse])
-def get_applications():
+def get_applications(service: ServiceDep):
     return service.get_all()
 
 
 @router.get("/{application_id}", response_model=ApplicationResponse)
-def get_application(application_id: int):
+def get_application(application_id: int, service: ServiceDep):
     try:
         return service.get_by_id(application_id)
 
@@ -36,12 +38,19 @@ def get_application(application_id: int):
 @router.post(
     "", response_model=ApplicationResponse, status_code=status.HTTP_201_CREATED
 )
-def create_application(application: ApplicationCreate):
+def create_application(
+    application: ApplicationCreate,
+    service: ServiceDep,
+):
     return service.create(application)
 
 
 @router.put("/{application_id}", response_model=ApplicationResponse)
-def update_application(application_id: int, application: ApplicationUpdate):
+def update_application(
+    application_id: int,
+    application: ApplicationUpdate,
+    service: ServiceDep,
+):
     try:
         return service.update(application_id, application)
 
@@ -54,7 +63,9 @@ def update_application(application_id: int, application: ApplicationUpdate):
 
 @router.patch("/{application_id}/status", response_model=ApplicationResponse)
 def update_application_status(
-    application_id: int, application: ApplicationStatusUpdate
+    application_id: int,
+    application: ApplicationStatusUpdate,
+    service: ServiceDep,
 ):
     try:
         return service.update_status(application_id, application.status)
@@ -67,7 +78,7 @@ def update_application_status(
 
 
 @router.delete("/{application_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_application(application_id: int):
+def delete_application(application_id: int, service: ServiceDep):
     try:
         service.delete(application_id)
 

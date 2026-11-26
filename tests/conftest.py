@@ -1,35 +1,35 @@
 import pytest
 
 from fastapi.testclient import TestClient
-from app.main import app
 
+from app.main import app
 from app.services.application_service import ApplicationService
 from app.repositories.application_repository import ApplicationRepository
 from app.routers import applications as application_router
+from app.dependencies import get_repository, get_service
 
 # conftest.py is a special local plugin file in pytest used to share fixtures, hooks, and configuration across multiple test files without needing explicit imports.
 # When you run pytest, it automatically discovers any conftest.py file in your test directory and makes its contents available to all tests in that directory and its subdirectories.
 
 
 @pytest.fixture
-def repository():
+def repository() -> ApplicationRepository:
     return ApplicationRepository()
 
 
 @pytest.fixture
-def service():
-    return ApplicationService()
+def service(repository: ApplicationRepository) -> ApplicationService:
+    return get_service(repository)
 
 
 @pytest.fixture
-def client(monkeypatch, service):
-    # temporarily replaces application_router's service with the service fixture
-    # after the test runs application_router's service resets to its original value
-    # thos provides test isolation
-    monkeypatch.setattr(application_router, "service", service)
-
-    with TestClient(app) as test_client:
-        yield test_client
+def client(repository: ApplicationRepository):
+    app.dependency_overrides[get_repository] = lambda: repository
+    try:
+        with TestClient(app) as test_client:
+            yield test_client
+    finally:
+        app.dependency_overrides.clear()
 
 
 @pytest.fixture
