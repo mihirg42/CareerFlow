@@ -13,7 +13,28 @@ from app.exceptions import (
 
 from app.services.application_service import ApplicationService
 
-ALLOWED_TRANSITIONS = ApplicationService.ALLOWED_TRANSITIONS
+ALLOWED_TRANSITIONS = {
+    ApplicationStatus.APPLIED: {
+        ApplicationStatus.SHORTLISTED,
+        ApplicationStatus.REJECTED,
+        ApplicationStatus.WITHDRAWN,
+    },
+    ApplicationStatus.SHORTLISTED: {
+        ApplicationStatus.INTERVIEW,
+        ApplicationStatus.REJECTED,
+        ApplicationStatus.WITHDRAWN,
+    },
+    ApplicationStatus.INTERVIEW: {
+        ApplicationStatus.OFFERED,
+        ApplicationStatus.REJECTED,
+        ApplicationStatus.WITHDRAWN,
+    },
+    ApplicationStatus.OFFERED: {
+        ApplicationStatus.WITHDRAWN,
+    },
+    ApplicationStatus.REJECTED: set(),
+    ApplicationStatus.WITHDRAWN: set(),
+}
 
 
 PATHS_TO_STATUS = {

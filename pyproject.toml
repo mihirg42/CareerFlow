@@ -1,18 +1,15 @@
 [project]
 name = "careerflow"
 version = "0.1.0"
-description = "Add your description here"
+description = "CareerFlow is a career management tool that helps users track their job applications, interviews, and offers in a structured manner."
 readme = "README.md"
 authors = [
     { name = "mihirg42", email = "guptamihir7@gmail.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.15.2"
 dependencies = [
     "fastapi[standard]>=0.165.0",
 ]
-
-[project.scripts]
-careerflow = "careerflow:main"
 
 [build-system]
 requires = ["uv_build>=0.13.9,<0.14.0"]
@@ -24,3 +21,6 @@ dev = [
     "pytest>=9.2.0",
     "pytest-cov>=7.1.0",
 ]
+
+[tool.uv]
+package = false
